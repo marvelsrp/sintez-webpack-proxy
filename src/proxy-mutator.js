@@ -50,7 +50,7 @@ export default class ProxyMutator extends BaseEvents {
         case isGETMethod:
           this.emit('proxy', {req: req, res: res});
           params.cache = this.memory;
-          params.cacheMaxAge = 3600;
+          params.cacheMaxAge = this.config.cacheMaxAge || 3600;
           break;
         default:
           this.emit('pass', {req: req, res: res});

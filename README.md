@@ -5,7 +5,7 @@ High performance streaming http request reverse proxy for [Sintez](https://githu
 #Environment **dev-proxy.yml**:
 ``` yml
 include:
-  - local.yml
+  - %base_config%.yml
 
 api:
   protocol: %protocol%

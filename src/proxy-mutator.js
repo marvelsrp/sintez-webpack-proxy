@@ -1,7 +1,7 @@
 import BaseEvents from 'base-events';
 import memoryCache from 'memory-cache-stream';
 import requestProxy from 'express-request-proxy';
-import _ from 'lodash';
+
 import urljoin from 'url-join';
 
 export default class ProxyMutator extends BaseEvents {
@@ -29,15 +29,15 @@ export default class ProxyMutator extends BaseEvents {
 
     this.server.app.all(this.path, (req, res) => {
 
-      var params = {
+      let params = {
         url: this.url,
         timeout: 1800000,
         headers: (req.headers) ? {Cookie: req.headers.cookie} : null
       };
 
-      var isIgnore = this.isIgnore(req.path);
-      var isFlush = this.isFlush(req.path);
-      var isGETMethod = req.method === 'GET';
+      let isIgnore = this.isIgnore(req.path);
+      let isFlush = this.isFlush(req.path);
+      let isGETMethod = req.method === 'GET';
 
       switch ( true ){
         case isIgnore:
@@ -63,7 +63,7 @@ export default class ProxyMutator extends BaseEvents {
   }
 
   normalize(value) {
-    var result = value;
+    let result = value;
     if (value && !Array.isArray(value))  {
       result = [ value ];
     }

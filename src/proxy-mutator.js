@@ -2,6 +2,7 @@ import BaseEvents from 'base-events';
 import memoryCache from 'memory-cache-stream';
 import requestProxy from 'express-request-proxy';
 import _ from 'lodash';
+import urljoin from 'url-join';
 
 export default class ProxyMutator extends BaseEvents {
   constructor(key, config, advanced) {
@@ -11,8 +12,7 @@ export default class ProxyMutator extends BaseEvents {
     this.server = config.webpack.getServer();
     this.memory = memoryCache();
     this.path = config['base-path'] + '/*';
-    this.url = config.protocol + '://' + config.host + this.path;
-
+    this.url = urljoin(config.protocol + '://' + config.host, this.path);
     this.server.app.use( (req, res, next) => {
       res.header('Access-Control-Allow-Origin', req.headers.origin);
       res.header('Access-Control-Allow-Credentials', true);

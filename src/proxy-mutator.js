@@ -69,7 +69,7 @@ export default class ProxyMutator extends BaseEvents {
       return this.config['base-path'] + path === p;
     })(this.config['flush-path']);
 
-    return Boolean(found);
+    return !!found;
   }
 
   serve(callback) {

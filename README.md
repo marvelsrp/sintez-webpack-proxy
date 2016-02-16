@@ -2,7 +2,7 @@
 
 High performance streaming http request reverse proxy for [Sintez](https://github.com/frankland/sintez).
 
-#Environment **dev-proxy.yml**:
+##Environment **dev-proxy.yml**:
 ``` yml
 include:
   - %base_config%.yml

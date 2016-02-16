@@ -57,16 +57,16 @@ export default class ProxyMutator extends BaseEvents {
     });
 
   }
-  isIgnore(p) {
+  isIgnore(findPath) {
     let found = ((path) => {
-      return this.config['base-path'] + path === p;
+      return this.config['base-path'] + path === findPath;
     })(this.config['ignore-path']);
 
     return Boolean(found);
   }
-  isFlush(p) {
+  isFlush(findPath) {
     let found = ((path) => {
-      return this.config['base-path'] + path === p;
+      return this.config['base-path'] + path === findPath;
     })(this.config['flush-path']);
 
     return !!found;

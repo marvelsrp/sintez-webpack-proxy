@@ -8,6 +8,10 @@ export default class ProxyMutator extends BaseEvents {
   constructor(key, config, advanced) {
     super();
     this.config = config;
+
+    this.config['ignore-path'] = this.normalize(this.config['ignore-path']);
+    this.config['flush-path'] = this.normalize(this.config['flush-path']);
+
     this.webpack = config.webpack;
     this.server = config.webpack.getServer();
     this.memory = memoryCache();
@@ -57,19 +61,23 @@ export default class ProxyMutator extends BaseEvents {
     });
 
   }
-  isIgnore(findPath) {
-    let found = ((path) => {
-      return this.config['base-path'] + path === findPath;
-    })(this.config['ignore-path']);
 
-    return Boolean(found);
+  normalize(value) {
+    var result = value;
+    if (value && !Array.isArray(value))  {
+      result = [ value ];
+    }
+    return result;
   }
-  isFlush(findPath) {
-    let found = ((path) => {
-      return this.config['base-path'] + path === findPath;
-    })(this.config['flush-path']);
 
-    return !!found;
+  isIgnore(findPath) {
+    return this.config['ignore-path']
+      .some(path => urljoin(this.config['base-path'],  path) === findPath);
+  }
+
+  isFlush(findPath) {
+    return this.config['flush-path']
+      .some(path => urljoin(this.config['base-path'],  path) === findPath);
   }
 
   serve(callback) {

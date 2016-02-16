@@ -19,7 +19,7 @@ bo-proxy-server:
     - /%ignore-path%
   flush-path:
     - /%flush-path%
-  webpack: webpack ~ webpack
+  webpack: webpack ~ %webpack-config%
 ```
 
 

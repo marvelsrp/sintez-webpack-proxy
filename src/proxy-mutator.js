@@ -1,30 +1,44 @@
 import BaseEvents from 'base-events';
 import memoryCache from 'memory-cache-stream';
 import requestProxy from 'express-request-proxy';
-
 import urljoin from 'url-join';
 
+const DEFAULT_CACHE_MAX_AGE = 3600;
+
 const normalize = (value) => {
-  let result = value;
-  if (value && !Array.isArray(value))  {
-    result = [ value ];
+  let result = [];
+
+  if (Array.isArray(value))  {
+    result = value;
+  } else {
+    result.push(value);
   }
+
   return result;
 };
 
-export default class ProxyMutator extends BaseEvents {
+class ProxyMutator extends BaseEvents {
   constructor(key, config, advanced) {
     super();
-    this.config = config;
+    if (!config){
+      return false;
+    }
 
-    this.config['ignore-path'] = normalize(this.config['ignore-path']);
-    this.config['flush-path'] = normalize(this.config['flush-path']);
+    this.normalized = Object.assign({}, config, {
+      basePath: config.basePath || '',
+      ignorePaths: normalize(config.ignorePaths),
+      flushPaths: normalize(config.flushPaths),
+      cacheMaxAge:  config.cacheMaxAge || DEFAULT_CACHE_MAX_AGE
+    });
+
+    this.normalized.APIUrl = urljoin(config.protocol + '://' + config.host, this.normalized.basePath + '/*')
+
+    console.log(this.normalized);
 
     this.webpack = config.webpack;
     this.server = config.webpack.getServer();
     this.memory = memoryCache();
-    this.path = config['base-path'] + '/*';
-    this.url = urljoin(config.protocol + '://' + config.host, this.path);
+
     this.server.app.use( (req, res, next) => {
       res.header('Access-Control-Allow-Origin', req.headers.origin);
       res.header('Access-Control-Allow-Credentials', true);
@@ -35,10 +49,10 @@ export default class ProxyMutator extends BaseEvents {
     });
 
 
-    this.server.app.all(this.path, (req, res) => {
+    this.server.app.all(this.normalized.basePath + '/*', (req, res) => {
 
       let params = {
-        url: this.url,
+        url: this.normalized.APIUrl,
         timeout: 1800000,
         headers: (req.headers) ? {Cookie: req.headers.cookie} : null
       };
@@ -58,7 +72,7 @@ export default class ProxyMutator extends BaseEvents {
         case isGETMethod:
           this.emit('proxy', {req: req, res: res});
           params.cache = this.memory;
-          params.cacheMaxAge = this.config.cacheMaxAge || 3600;
+          params.cacheMaxAge = this.normalized.cacheMaxAge;
           break;
         default:
           this.emit('pass', {req: req, res: res});
@@ -73,16 +87,18 @@ export default class ProxyMutator extends BaseEvents {
 
 
   isIgnore(findPath) {
-    return this.config['ignore-path']
-      .some(path => urljoin(this.config['base-path'],  path) === findPath);
+    return this.normalized.ignorePaths
+      .some(path => urljoin(this.normalized.basePath,  path) === findPath);
   }
 
   isFlush(findPath) {
-    return this.config['flush-path']
-      .some(path => urljoin(this.config['base-path'],  path) === findPath);
+    return this.normalized.flushPaths
+      .some(path => urljoin(this.normalized.basePath,  path) === findPath);
   }
 
   serve(callback) {
     this.webpack.serve(callback, this.server);
   }
 }
+
+export default ProxyMutator;

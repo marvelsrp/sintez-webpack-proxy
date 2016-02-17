@@ -1,6 +1,6 @@
 {
   "name": "sintez-webpack-proxy",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Intelligent http proxy middleware for Sintez",
   "main": "index.js",
   "scripts": {

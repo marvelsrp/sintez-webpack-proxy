@@ -4,13 +4,21 @@ import requestProxy from 'express-request-proxy';
 
 import urljoin from 'url-join';
 
+const normalize = (value) => {
+  let result = value;
+  if (value && !Array.isArray(value))  {
+    result = [ value ];
+  }
+  return result;
+};
+
 export default class ProxyMutator extends BaseEvents {
   constructor(key, config, advanced) {
     super();
     this.config = config;
 
-    this.config['ignore-path'] = this.normalize(this.config['ignore-path']);
-    this.config['flush-path'] = this.normalize(this.config['flush-path']);
+    this.config['ignore-path'] = normalize(this.config['ignore-path']);
+    this.config['flush-path'] = normalize(this.config['flush-path']);
 
     this.webpack = config.webpack;
     this.server = config.webpack.getServer();
@@ -62,13 +70,7 @@ export default class ProxyMutator extends BaseEvents {
 
   }
 
-  normalize(value) {
-    let result = value;
-    if (value && !Array.isArray(value))  {
-      result = [ value ];
-    }
-    return result;
-  }
+
 
   isIgnore(findPath) {
     return this.config['ignore-path']
